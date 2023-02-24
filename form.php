@@ -1,4 +1,5 @@
 <?php
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -11,9 +12,13 @@ if ($conn->connect_error) {
   die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT * FROM data";
-$result = $conn->query($sql);
-
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+  }
+  
+  $sql = "SELECT * FROM data";
+  $result = $conn->query($sql);
+  
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,6 +68,15 @@ $result = $conn->query($sql);
           justify-content:center;
           margin-top:5px;
         }
+        #link {
+            color:#65a765;
+        }
+        #link:hover {
+            color:#ADD8E6;
+        }
+        p {
+            font-weight: 700;
+         }
 
     </style>
 
@@ -82,77 +96,53 @@ $result = $conn->query($sql);
             <input type="checkbox" class="form-check-input" onClick="toggleBasic(this)" style="margin-bottom:40px;margin-top:0px;margin-right:10px;margin-left:20px;">
             <h3 class="fs-subtitle">Toggle all Basic question</h3>
         </div>
-        <?php 
+        <?php
         if ($result->num_rows > 0) {
-          // output data of each row
-          while($row = $result->fetch_assoc()) {
-            ?>
-            <div class="question" style="text-align: left">
-          <div style="display: flex;">
-            <input
-              class="form-check-input selector <?php echo $row["category"]?>"
-              type="checkbox"
-              value="<?php echo $row["question_id"]?>"
-              name="que<?php echo $row["question_id"]?>"
-              id="flexCheckDefault"
-              style="margin-right: 10px; margin-top: 0px"
-            />
-            <h3 class="fs-subtitle">Question No. <?php echo $row["question_id"]?></h3>
-          </div>
-          <div>
-          <h5><?php echo $row["question_text"]?></h5>
-          <input class="field" type="<?php echo $row["input_type"]?>" name="<?php echo $row["question_id"]?>" />
-          </div>
-        </div>
-            <?php
+            // output data of each row
+            while($row = $result->fetch_assoc()) {
+                $id = "que" . $row["question_id"];
+                if(isset($_GET[$id])){
+                $data = $_GET[$id];
+                if($row["question_id"] == $data) {
+              ?>
+              <div class="question" style="text-align: left">
+                  <div style="display: flex;">
+                    <input
+                      class="form-check-input selector <?php echo $row["category"]?>"
+                      type="checkbox"
+                      value="<?php echo $row["question_id"]?>"
+                      name="que<?php echo $row["question_id"]?>"
+                      id="flexCheckDefault"
+                      style="margin-right: 10px; margin-top: 0px"
+                    />
+                    <h3 class="fs-subtitle">Question No. <?php echo $row["question_id"]?></h3>
+                  </div>
+                  <div>
+                  <h5><?php echo $row["question_text"]?></h5>
+                  <input class="field" type="<?php echo $row["input_type"]?>" name="<?php echo $row["question_id"]?>" />
+                  </div>
+                </div>
+              <?php
+              }
+                }
+            }
+          } else {
+            echo "0 results";
           }
-        } else {
-          echo "0 results";
-        }
-        
-        ?>
           
-        <div style="display:flex;justify-content:center;text-align:center;">
-        <!-- <input type="text" name="email" placeholder="Email" />
-        <input type="password" name="pass" placeholder="Password" />
-        <input type="password" name="cpass" placeholder="Confirm Password" /> -->
-        <input type="submit" name="next" class="action-button" value="Submit" />
+          $conn->close();
+        ?>
+
+        <div style="justify-content:center;text-align:center;">
+          <small><a id="link"></a></small>
+        </div>
         
-        <input
-          id="a"
-          type="button"
-          name="next"
-          class="action-button"
-          value="Add New"
-        />
-        <div id="c"><h4>X</h4></div>
+        <div style="justify-content:center;text-align:center;">
+            <input type="button" name="getlink" class="clipboard action-button" value="Get Link" />
+            <p>click the button to copy the URL</p>
+
         </div>
     </form>
-        <div id="b" style="text-align:center;">
-          <form id="question_form" method="post" action="data.php">
-            <input class="field" id="question" type="text" name="question" placeholder="Write Your Question Here" />
-            <select class="field" id="question_type" name="question_type">
-              <option value="text">Text</option>
-              <option value="textarea">Textarea</option>
-              <option value="number">Number</option>
-              <option value="email">Email</option>
-              <option value="date">Date</option>
-            </select>
-            <input class="field" id="category" type="text" name="category" placeholder="Write Category of Question Here" />
-            <select class="field" id="recurring" name="recurring">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-            <div style="text-align:center;">
-            <input
-            type="submit"
-            name="create"
-            class="action-button"
-            value="Create"
-            />
-            </div>
-          </form>
-        </div>
         </div>
       
     <!-- Option 1: Bootstrap Bundle with Popper -->
@@ -178,6 +168,19 @@ $result = $conn->query($sql);
         checkboxes[i].checked = source.checked;
       }
     }
+    </script>
+    <script>
+        var $temp = $("<input>");
+        var $url = $(location).attr('href');
+        document.getElementById("link").innerHTML = $url;
+
+        $('.clipboard').on('click', function() {
+          $("body").append($temp);
+          $temp.val($url).select();
+          document.execCommand("copy");
+          $temp.remove();
+          $("p").text("URL copied!");
+        })
     </script>
     <script src="./jquery-3.6.0.min.js"></script>
     <script>

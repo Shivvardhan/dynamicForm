@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dynamic Form</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Dynamic Form</h1>
+    <form id="my-form">
+      <div id="questions-container">
+        <!-- Existing questions will be added here -->
+      </div>
+      <button type="button" id="add-question-btn">Add Question</button>
+      <br /><br />
+      <label for="selected-questions">Select Questions:</label>
+      <select id="selected-questions" multiple>
+        <!-- Available questions will be added here -->
+      </select>
+      <br /><br />
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      // Define an array to store questions
+      var questions = [];
+
+      // Add an event listener to the "Add Question" button
+      $("#add-question-btn").on("click", function () {
+        // Ask the user to enter a new question
+        var newQuestion = prompt("Enter a new question:");
+
+        // If the user entered a question, add it to the array and display it on the page
+        if (newQuestion !== null && newQuestion.trim() !== "") {
+          questions.push(newQuestion);
+          $("#questions-container").append(
+            `<div><input type="checkbox" name="questions[]" value="${newQuestion}">${newQuestion}</div>`
+          );
+        }
+      });
+
+      // Add available questions to the dropdown menu
+      function updateQuestions() {
+        $("#selected-questions").empty();
+        for (var i = 0; i < questions.length; i++) {
+          $("#selected-questions").append(
+            `<option value="${questions[i]}">${questions[i]}</option>`
+          );
+        }
+      }
+
+      // Call the updateQuestions function on page load
+      updateQuestions();
+
+      // Add an event listener to the form
+      $("#my-form").on("submit", function (event) {
+        // Prevent the form from submitting
+        event.preventDefault();
+
+        // Get the selected questions
+        var selectedQuestions = $("#selected-questions").val();
+
+        // Display the selected questions in an alert
+        alert("Selected questions: " + selectedQuestions);
+      });
+    </script>
+  </body>
+</html>
